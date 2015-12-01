@@ -1,3 +1,7 @@
-[submodule "talk/reveal.js"]
-	path = talk/reveal.js
+[submodule "ensime/reveal.js"]
+	path = ensime/reveal.js
 	url = git@github.com:hakimel/reveal.js.git
+
+[submodule "optimising/talk/reveal.js"]
+        path = optimising/talk/reveal.js
+        url = git@github.com:hakimel/reveal.js.git

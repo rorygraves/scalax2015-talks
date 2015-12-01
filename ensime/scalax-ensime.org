@@ -1,0 +1,61 @@
+#+TITLE: The Atomic Sublimity of Ensime
+#+AUTHOR: Rory Graves
+#+DATE: Scala eXchange 2015
+
+#+TODO: TODO | RESEARCH | NOTES | CHART | DIAGRAM | DRAWING | CODE | VIDEO
+
+* Introduction
+
+** Rory Graves =@a_dev_musing=
+
+#+BEGIN_NOTES
+
+Actors before they were cool.
+
+Ensime Lightening talk is straight after this talk in this room.
+
+#+END_NOTES
+
+- PhD in Computer Science
+    - Active Networks
+    - Wrote a JVM
+- Wrote mobile games before it was cool
+- Shows people around an old windmill at weekends
+- ENSIME core developer
+- Spent far too long seeing every example in this code.
+
+** Outline
+
+- The state of the union
+
+
+* Whats happening in Ensime
+
+* Where we are going
+
+
+** Cool stuff thats coming
+
+- Abstracting the compiler to support Dotty - Rory
+- Graphpocolypse - Sam
+- Enjime - Aemon
+- More editor support
+  - Vim -
+  - Atom
+  - ...
+
+
+
+* Conclusions
+
+- Ensime is evolving
+
+- Its exciting times
+
+- Come join the party!
+
+* Question Time!
+
+Thanks for listening!
+
+Rory Graves (@a_dev_musing)

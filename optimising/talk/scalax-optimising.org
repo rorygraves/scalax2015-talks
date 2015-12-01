@@ -19,7 +19,7 @@
 
 It's the scientific method
 
-1. Observe
+1. Observation
 2. Hypothesis
 3. Test
 4. Repeat
@@ -257,7 +257,7 @@ Ensime Lightening talk is straight after this talk in this room.
 
 - Ordering to reduce processor cache misses
 - loop unrolling
-- branch predition
+- branch prediction
 
 ** Multithreading
 
@@ -287,7 +287,7 @@ Ensime Lightening talk is straight after this talk in this room.
 
 - CPUs are fast
 - no, really fast.
-- no, really really fast!
+- no, fast than that!
 - Intel Core i7 5960X -	238,310 MIPS at 3.0 GHz
 - Ensure they do useful work, keep them fed.
 
@@ -330,47 +330,94 @@ https://gist.github.com/jboner/2841832
 - Object creation and lifecycle management is not free
 
 
-* Benchmarking and Analysis
-
+* Watching your application
 
 
 ** Holistic approach
 
-- Generally if you have a performance problem
+- Generally if you have a performance problem you know
+- You should have a feel for
+  - what your application is doing
+  - how many times its doing it.
+  - how long it takes.
+
+** Watch your app
+
+- tail the log
+- watch jVisualVM
+  - be aware of how it shows cpu usage
+
+
+Picture of GC Behaviour
+
+** JVisualVM CPU Usage
+
+
+PIC CPU Usage - cores div total
+
+- Be aware of cpu count
+
+** JVisualVM Memory Churn
+
+** JVisualVM Premature tenuring
+
+- Full GC stalls
+  - can be even more damaging than you think.
+
+** You need to know your application
+
+
+* Profiling your application
+
+** Why?
+
+- Profiling tells you where your app is actually spending time
+- It may surprise you...
+
+** Look where your app is spending time
+
+JVisualVM/Yourkit - hotspots
+
+** Look what your application is creating
+
+JVisualVM/Yourkit filtered by <init> - sorted by count
+
+- You can see backtraces of where these are coming from.
+
+** Things to look out for
+
+ - List items
+ - Map
+ - Unexpected Boxing
+ - Rich??? boxing
+
+** The rest of the talk
+
+There are no silver bullets - follow the process
 
 
 
+Explores worked examples of things I've actually seen
 
+*
 
-** Lets code!
+* Case Class HashCode
 
+** ...
 
+* Nested toString
 
-#+BEGIN_NOTES
-#+END_NOTES
+* Rich boxing
 
-#+BEGIN_SRC scala
-package brucelee.api {
-  sealed trait Receptacle
-  case class Glass(a: String) extends Receptacle
-  case class Bottle(a: Int) extends Receptacle
-  case class Teapot(a: Boolean) extends Receptacle
-}
-#+END_SRC
+* Breakout
 
-#+BEGIN_SRC scala
-package brucelee.format {
-  object MyFormats extends FamilyFormats {
-    implicit override def eitherFormat[A, B](implicit
-      a: JsonFormat[A],
-      b: JsonFormat[B]) = super.eitherFormat[A, B]
-    implicit val symbolFormat = SymbolJsonFormat
+* More advanced loop fusion
 
-    implicit val ReceptacleF: JsonFormat[Receptacle] = cachedImplicit
-  }
-}
-#+END_SRC
+* Conclusions
 
+- Know your application
+
+- Simple Optimisation can make a huge difference,
 
 * Question Time!
 
