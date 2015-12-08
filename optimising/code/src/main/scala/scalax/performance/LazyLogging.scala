@@ -106,4 +106,23 @@ class LazyLogging {
     if(debugEnabled)
       tmp = x
   }
+
+  @Benchmark
+  def forLoopGuardedOptimised(): Unit = {
+    var x = 0
+
+    import scalaxy.streams.optimize
+    optimize {
+      for(i <- 1 to limit) {
+        if(debugEnabled)
+          logDebug(s"started iteration $i")
+        x += i
+        if(debugEnabled)
+          logDebug(s"finished iteration $i")
+      }
+    }
+    if(debugEnabled)
+      tmp = x
+
+  }
 }

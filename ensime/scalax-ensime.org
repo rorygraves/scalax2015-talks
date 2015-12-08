@@ -6,56 +6,164 @@
 
 * Introduction
 
+** The Church of Emacs
+
+[[images/Berlage-Zaal-Amsterdam.jpg]]
+
 ** Rory Graves =@a_dev_musing=
 
-#+BEGIN_NOTES
-
-Actors before they were cool.
-
-Ensime Lightening talk is straight after this talk in this room.
-
-#+END_NOTES
-
-- PhD in Computer Science
+- An ENSIME core developer
+- Believes strongly that tooling needs a step change
+- A little background on me
+    - PhD in Computer Science
     - Active Networks
     - Wrote a JVM
-- Wrote mobile games before it was cool
-- Shows people around an old windmill at weekends
-- ENSIME core developer
-- Spent far too long seeing every example in this code.
 
 ** Outline
 
-- The state of the union
+- A brief introduction to Ensime
+- The new kids in town
+- where next!
 
+** What is Ensime? (1)
 
-* Whats happening in Ensime
+- ENhanced Scala Interaction Mode for text Editors
+- Originally designed for Emacs
+- Its really an IDE server
+- All of the logic is behind a protocol
+- which leads to some interesting possibilities
 
-* Where we are going
+** What is Ensime? (2)
 
-
-** Cool stuff thats coming
-
-- Abstracting the compiler to support Dotty - Rory
-- Graphpocolypse - Sam
-- Enjime - Aemon
-- More editor support
-  - Vim -
+- A Server
+  - Wraps the Presentation Compiler
+  - Indexes Jars
+  -
+- A protocol for querying the Server
+- A number of clients
+  - Emacs.
+  - Sublime
   - Atom
-  - ...
+  - Vim
+  - Your editor here?
 
+** Provides
+
+- Semantic highlighting
+- Red squigglies
+- Completions
+- Documentation (Jump to Source/Doc)
+- Debugging
+- Refactoring
+
+** More details
+
+- See the talks that already exist
+  - ScalaX 2014 https://skillsmatter.com/skillscasts/6000-ensime-the-other-ide
+  - ScalaDays 2015 - https://www.parleys.com/tutorial/ensime-why-would-anybody-build-another-scala-ide
+
+** Shiny Pictures
+
+<picture of emacs editing from previous talk>
+
+* Atom
+
+* Atomic Stats!
+
+- June - Now
+- 4 contributor
+ - Viktor Hedefalk (hedefalk), Arnout Engelen (raboof), Rik (mrmechko), Richard Dallaway (d6y),
+- 175 commits
+- 36 releases
+- 5 contributors
+
+* Sublime
+
+* Sublime Stats
+
+- 22 Contributors
+- Became an Ensime project in June
+- 319 commits
+- Old repo brought back to life
+- Xeno-By, Dick Wall, Rory Graves
+
+* Vim
+
+
+* Vimtastic Stats
+
+- 318 commits
+- Olivier Abdesselam (yazgoo), todesking, Sam Halliday (fommil)
+- 90% coverage!!!
+
+* The Server
+
+- Tweaks
+- Improvements
+- Bug fixes
+
+< server stat!!>
+
+
+
+
+
+* The coming storm!
+
+** Enjime - Aemon
+
+- Ensime supporting Java
+- In beta
+
+** Graphpocolypse! - Sam
+
+- Cross reference data in a graph DB.
+- A feature enable
+  - Find usage
+  - code analysis
+- Don't interrupt Sam
+
+** Improved debugging support - Robin/Chip
+
+- Our debugging support 'sort of works'
+- Looking to integrate https://github.com/chipsenkbeil/scala-debugger-api
+- Should give us huge boosts to breakpoints/stepping etc.
+
+** Compiler support - Rory
+
+- Abstract the presentation compiler interaction.
+- Unpicking compiler dependencies so we can support Dotty
+- Current we use a lot of internal Apis.
+
+** More editor support - Everybody
+
+- Editors are not at feature parity
+- They are evolving as we speak.
 
 
 * Conclusions
 
-- Ensime is evolving
+
+** Conclusion
+
+- Ensime continues to evolving
 
 - Its exciting times
 
 - Come join the party!
 
+** Hack Day!
+
+- ScalaXHack!
+- CodeNode, Underscore, London Scala User Group
+- Come hack on cool open source stuff
+  - Ensime, Ammonite, Freeslick, Shapeless...
+
+https://skillsmatter.com/conferences/7402-scalaxhack
+
+
 * Question Time!
 
 Thanks for listening!
-
+https://github.com/ensime/ensime-server
 Rory Graves (@a_dev_musing)

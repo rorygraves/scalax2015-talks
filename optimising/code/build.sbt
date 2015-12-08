@@ -6,8 +6,8 @@ scalaVersion := "2.11.7"
 
 enablePlugins(JmhPlugin)
 
-libraryDependencies ++= Seq(
-)
+// Dependency at compilation-time only (not at runtime).
+libraryDependencies += "com.nativelibs4java" %% "scalaxy-streams" % "0.3.4" % "provided"
 
 //mainClass in Compile := Some("")
 

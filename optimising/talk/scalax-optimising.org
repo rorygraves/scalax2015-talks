@@ -4,7 +4,7 @@
 
 #+TODO: TODO | RESEARCH | NOTES | CHART | DIAGRAM | DRAWING | CODE | VIDEO
 
-* Lets start with an example!
+* Intro 1
 
 ** Knuth
 
@@ -17,13 +17,136 @@
 
 ** TL;DR;
 
-It's the scientific method
+1. You already know how to do this
+2. There is no silver bullet
+3. It's the scientific method
+  - Measure
+  - Hypothesis
+  - Apply fix
+  - Measure
+  - If slower, remove - goto start
+  - If fast enough, stop
+  - Goto start
 
-1. Observation
-2. Hypothesis
-3. Test
-4. Repeat
 
+* Now for the Introduction!
+
+
+** Rory Graves =@a_dev_musing=
+
+#+BEGIN_NOTES
+
+Actors before they were cool.
+
+Ensime Lightening talk is straight after this talk in this room.
+
+#+END_NOTES
+
+- PhD in Computer Science
+    - Active Networks
+    - Wrote a JVM
+- Wrote mobile games before it was cool
+- Shows people around an old windmill at weekends
+- ENSIME core developer
+- Spent far too long seeing every example in this code.
+
+* What the rest of the talk says!
+
+** Outline
+
+- The things I'm not going to talk about
+- Basic information
+- Spotting performance issues
+  - once you understand them fixing them is normally easy
+- Examples from the field
+
+* What I am not going to talk about...
+
+** Microbenchmarks
+
+- Useful in a subset of cases
+- This talk focuses on big picture optimisations
+
+** Mechanical Sympathy
+
+- Ordering to reduce processor cache misses
+- loop unrolling
+- branch prediction
+
+** Multithreading
+
+- Switching overhead
+- Complexity overhead
+- Simple things can be done faster on one thread
+
+** Real numbers
+
+- Exact numbers depend on too many factors, only comparisons are useful
+  - cpu
+  - memory
+  - compiler code generation
+  - JIT optimisation
+
+** Big O
+
+- I lied!
+- But I'm not going into details
+- Nothing here beats choosing the right algorithm
+- But optimisation can make a too slow problem good enough
+- https://www.coursera.org/course/algo
+
+* Basic information
+
+** CPU performance.
+
+- CPUs are fast
+- no, really fast.
+- no, fast than that!
+- Intel Core i7 5960X -	238,310 MIPS at 3.0 GHz
+- Ensure they do useful work, keep them fed.
+
+** Latency cheatsheet
+
+#+BEGIN_SRC
+Latency Comparison Numbers
+--------------------------
+L1 cache reference                            0.5 ns
+Branch mispredict                             5   ns
+L2 cache reference                            7   ns             14x L1 cache
+Mutex lock/unlock                            25   ns
+Main memory reference                       100   ns             20x L2 cache, 200x L1 cache
+Compress 1K bytes with Zippy              3,000   ns
+Send 1K bytes over 1 Gbps network        10,000   ns    0.01 ms
+Read 4K randomly from SSD*              150,000   ns    0.15 ms
+Read 1 MB sequentially from memory      250,000   ns    0.25 ms
+Round trip within same datacenter       500,000   ns    0.5  ms
+Read 1 MB sequentially from SSD*      1,000,000   ns    1    ms  4X memory
+Disk seek                            10,000,000   ns   10    ms  20x datacenter roundtrip
+Read 1 MB sequentially from disk     20,000,000   ns   20    ms  80x memory, 20X SSD
+Send packet CA->Netherlands->CA     150,000,000   ns  150    ms
+#+END_SRC
+
+https://gist.github.com/jboner/2841832
+
+** Tools
+
+- jmh
+- jVisualVM
+- YourKit (free OpenSource license)
+- Common sense
+- Scalaxy
+- https://github.com/fommil/lions-share
+
+** The hidden cost of GC
+
+- Functional programming tends to create lots of short term objects
+- Creating objects is expensive
+  - Work to create
+  - work to free
+- Object creation and lifecycle management is not free
+
+
+* Logging made simple!
 ** Debugging logging
 
 #+BEGIN_NOTES
@@ -189,9 +312,26 @@ object LazyConfig {
 
 - ~750x faster
 - No object creation.
-- A bit ugly
+- Its ugly
   - but we can fix that
   - https://github.com/nativelibs4java/Scalaxy
+
+** Scalaxy to the rescue!
+
+#+BEGIN_SRC scala
+    import scalaxy.streams.optimize
+    optimize {
+      for(i <- 1 to limit) {
+        if(debugEnabled)
+          logDebug(s"started iteration $i")
+        x += i
+        if(debugEnabled)
+          logDebug(s"finished iteration $i")
+      }
+    }
+#+END_SRC
+
+The exact same results as our hand optimised version with none of the ugly.
 
 ** Summary
 
@@ -203,134 +343,20 @@ object LazyConfig {
 | lazyLogging        | 157.277  | 2,000,004  | ~32X|
 | guardedLogging     | 2111.598 | 4          | ~430 |
 | while loop guarded | 3615.795 | 0          | ~750 |
-
+| for loop optimized | 3420.798 | 0          | ~750 |
 - Naive code can be slow
 - Naive fixes can be slow
 
+* Caveat Emptor
+
 ** Microbenchmarks are flawed
 
-- In the real world Great if you already know whats slow
+- In the real world, you do not know which bit is slow
+  - its often quite surprising
 - Benchmarks interaction with:
   - JIT
   - Dead code removal.
   - caches
-
-* Now for the Introduction!
-
-
-** Rory Graves =@a_dev_musing=
-
-#+BEGIN_NOTES
-
-Actors before they were cool.
-
-Ensime Lightening talk is straight after this talk in this room.
-
-#+END_NOTES
-
-- PhD in Computer Science
-    - Active Networks
-    - Wrote a JVM
-- Wrote mobile games before it was cool
-- Shows people around an old windmill at weekends
-- ENSIME core developer
-- Spent far too long seeing every example in this code.
-
-* What the rest of the talk says!
-
-** Outline
-
-- The things I'm not going to talk about
-- Basic information
-- Spotting performance issues
-  - once you understand them fixing them is normally easy
-- Examples from the field
-
-* What I am not going to talk about...
-
-** Microbenchmarks
-
-- Useful in a subset of cases
-- This talk focuses on big picture optimisations
-
-** Mechanical Sympathy
-
-- Ordering to reduce processor cache misses
-- loop unrolling
-- branch prediction
-
-** Multithreading
-
-- Switching overhead
-- Complexity overhead
-- Simple things can be done faster on one thread
-
-** Real numbers
-
-- Exact numbers depend on too many factors, only comparisons are useful
-  - cpu
-  - memory
-  - compiler code generation
-  - JIT optimisation
-
-** Big O
-
-- I lied!
-- But I'm not going into details
-- Nothing here beats choosing the right algorithm
-- But optimisation can make a too slow problem good enough
-- https://www.coursera.org/course/algo
-
-* Basic information
-
-** CPU performance.
-
-- CPUs are fast
-- no, really fast.
-- no, fast than that!
-- Intel Core i7 5960X -	238,310 MIPS at 3.0 GHz
-- Ensure they do useful work, keep them fed.
-
-** Latency cheatsheet
-
-#+BEGIN_SRC
-Latency Comparison Numbers
---------------------------
-L1 cache reference                            0.5 ns
-Branch mispredict                             5   ns
-L2 cache reference                            7   ns             14x L1 cache
-Mutex lock/unlock                            25   ns
-Main memory reference                       100   ns             20x L2 cache, 200x L1 cache
-Compress 1K bytes with Zippy              3,000   ns
-Send 1K bytes over 1 Gbps network        10,000   ns    0.01 ms
-Read 4K randomly from SSD*              150,000   ns    0.15 ms
-Read 1 MB sequentially from memory      250,000   ns    0.25 ms
-Round trip within same datacenter       500,000   ns    0.5  ms
-Read 1 MB sequentially from SSD*      1,000,000   ns    1    ms  4X memory
-Disk seek                            10,000,000   ns   10    ms  20x datacenter roundtrip
-Read 1 MB sequentially from disk     20,000,000   ns   20    ms  80x memory, 20X SSD
-Send packet CA->Netherlands->CA     150,000,000   ns  150    ms
-#+END_SRC
-
-https://gist.github.com/jboner/2841832
-
-** Tools
-
-- jhm
-- jvisualvm
-- YourKit (free OpenSource license)
-- Common sense
-
-** The hidden cost of GC
-
-- Functional programming tends to create lots of short term objects
-- Creating objects is expensive
-  - Work to create
-  - work to free
-- Object creation and lifecycle management is not free
-
-
-* Watching your application
 
 
 ** Holistic approach
@@ -347,8 +373,11 @@ https://gist.github.com/jboner/2841832
 - watch jVisualVM
   - be aware of how it shows cpu usage
 
+* Lets look at some GC graphs
 
-Picture of GC Behaviour
+** JVisualVM
+
+[[./images/JVisualVMOverview.png]]
 
 ** JVisualVM CPU Usage
 
@@ -364,7 +393,6 @@ PIC CPU Usage - cores div total
 - Full GC stalls
   - can be even more damaging than you think.
 
-** You need to know your application
 
 
 * Profiling your application
@@ -388,36 +416,159 @@ JVisualVM/Yourkit filtered by <init> - sorted by count
 
  - List items
  - Map
- - Unexpected Boxing
- - Rich??? boxing
+ - Boxing (primative and rich)
 
 ** The rest of the talk
 
 There are no silver bullets - follow the process
 
 
-
 Explores worked examples of things I've actually seen
-
-*
-
-* Case Class HashCode
-
-** ...
-
-* Nested toString
-
-* Rich boxing
 
 * Breakout
 
-* More advanced loop fusion
+** Code - Input
+
+#+BEGIN_SRC scala
+  case class Entry(id: String, value: String)
+  // using String keys to avoid boxing later
+  val inputs = (1 to 10000).map( i => Entry(s"$i", s"_${i}_")).toList
+#+END_SRC
+
+** Code - Normal
+
+#+BEGIN_SRC scala
+    val result = inputs.map { e => (e.id, e)}.toMap
+#+END_SRC
+
+- Creates an intermediate list of tuples, then converts them to a Map.
+- inputs.map(_) creates a list of tuples then toMap is called.
+
+** Code - Breakout
+
+#+BEGIN_SRC scala
+    import scala.collection.breakOut
+    val result : Map[String, Entry] = inputs.map { e => (e.id, e)}(breakOut)
+#+END_SRC
+
+- Note the typinf of result
+  - Allows breakout to infer the right builder
+  - inputs.map(_) uses the map builder to contruct result.
+
+** Breakout Performance
+
+
+| Benchmark |  iterations/sec |
+| Basic     |   505.101 |
+| Breakout  |   531.372 |
+
+- About 5% faster
+- Why?
+  - Avoids intermediate list
+- Downsides
+  - it only works for the final step
+
+
+* Loop Fusion
+
+** Some simple code
+
+#+BEGIN_SRC scala
+    for ((item, i) <- data.zipWithIndex; if item % 2 == 0) yield (item, i)
+#+END_SRC
+
+#+BEGIN_SRC
+[info] Result "basic":
+[info]   49489.977 ±(99.9%) 3232.966 ops/s [Average]
+[info]   (min, avg, max) = (43186.622, 49489.977, 53667.975), stdev = 3723.089
+[info]   CI (99.9%): [46257.011, 52722.944] (assumes normal distribution)
+#+END_SRC
+
+** Improved
+
+#+BEGIN_SRC scala
+    for (pair <- data.zipWithIndex; if pair._1 % 2 == 0) yield pair
+#+END_SRC
+
+- Avoids the creating of a second tuple.
+
+#+BEGIN_SRC
+[info] Result "basicOpt":
+[info]   60882.628 ±(99.9%) 4025.166 ops/s [Average]
+[info]   (min, avg, max) = (52000.969, 60882.628, 64968.267), stdev = 4635.387
+[info]   CI (99.9%): [56857.462, 64907.795] (assumes normal distribution)
+[info]
+#+END_SRC
+
+** Fused
+
+#+BEGIN_SRC scala
+    val lb = ListBuffer[(Int,Int)]()
+
+    var i = 0
+    var next = data
+    while(next != Nil) {
+      val item = next.head
+      if (item % 2 == 0) {
+        lb += i -> item
+      }
+      next = next.tail
+      i += 1
+    }
+    lb.result
+#+END_SRC
+
+- Avoids the creating of a second tuple.
+
+#+BEGIN_SRC
+[info] Result "fused":
+[info]   134105.814 ±(99.9%) 4901.077 ops/s [Average]
+[info]   (min, avg, max) = (119094.261, 134105.814, 139273.066), stdev = 5644.088
+[info]   CI (99.9%): [129204.737, 139006.891] (assumes normal distribution)#+END_SRC
+#+END_SRC
+
+** Fusing
+
+- The code is ugly!
+- 2.5 times faster than the original
+- Hide it in a method
+- Explore
+
+** Automatic Fusion
+ Scalaxy again
+
+#+BEGIN_SRC scala
+    import scalaxy.streams.optimize
+    optimize {
+      for ((item, i) <- data.zipWithIndex; if item % 2 == 0) yield (item, i)
+    }
+#+END_SRC
+
+#+BEGIN_SRC
+[info] Result "optimisedBasic":
+[info]   169777.490 ±(99.9%) 3726.578 ops/s [Average]
+[info]   (min, avg, max) = (153370.900, 169777.490, 174894.497), stdev = 4291.533
+[info]   CI (99.9%): [166050.912, 173504.068] (assumes normal distribution)
+#+END_SRC
+
+- 3 times faster than the original
+- Remove previous optimisations (they make it slower...)
+
+
+* boxing
+
+
+
+* Nested toString
+
 
 * Conclusions
 
 - Know your application
-
-- Simple Optimisation can make a huge difference,
+- You do not need to give up the functional lifestyle
+- Use the scientific method
+- Simple optimisation can make a huge difference
+- Check out Scalaxy https://github.com/nativelibs4java/scalaxy-streams
 
 * Question Time!
 
