@@ -22,15 +22,18 @@
 3. It's the scientific method
   - Measure
   - Hypothesis
-  - Apply fix
-  - Measure
-  - If slower, remove - goto start
-  - If fast enough, stop
-  - Goto start
+  - fix
+  - Check
+  - Repeat
 
+** Outline
 
-* Now for the Introduction!
-
+- A little about me
+- Basic information
+- Things I'm not going to talk about
+- Spotting performance issues
+  - once you understand them fixing them is normally easy
+- Examples from the field
 
 ** Rory Graves =@a_dev_musing=
 
@@ -49,16 +52,6 @@ Ensime Lightening talk is straight after this talk in this room.
 - Shows people around an old windmill at weekends
 - ENSIME core developer
 - Spent far too long seeing every example in this code.
-
-* What the rest of the talk says!
-
-** Outline
-
-- The things I'm not going to talk about
-- Basic information
-- Spotting performance issues
-  - once you understand them fixing them is normally easy
-- Examples from the field
 
 * What I am not going to talk about...
 
@@ -97,12 +90,14 @@ Ensime Lightening talk is straight after this talk in this room.
 
 * Basic information
 
-** CPU performance.
+** CPU performance
 
 - CPUs are fast
 - no, really fast.
 - no, fast than that!
-- Intel Core i7 5960X -	238,310 MIPS at 3.0 GHz
+- Intel Core i7 5960X
+  - 3000M cycles/second
+  -	238,310 MIPS at 3.0 GHz
 - Ensure they do useful work, keep them fed.
 
 ** Latency cheatsheet
@@ -146,7 +141,8 @@ https://gist.github.com/jboner/2841832
 - Object creation and lifecycle management is not free
 
 
-* Logging made simple!
+* A worked example, logging!
+
 ** Debugging logging
 
 #+BEGIN_NOTES
@@ -158,7 +154,6 @@ Lets take a critical loop in our program.
 #+BEGIN_SRC scala
   def myHardworkingFunction(): Int = {
     var x = 0
-
     for(i <- 1 to limit) {
       logDebug(s"started iteration $i")
       x += i // some maths type work
@@ -166,22 +161,6 @@ Lets take a critical loop in our program.
     }
 
     x
-  }
-#+END_SRC
-
-** JMH Benchmark
-
-#+BEGIN_SRC scala
-  @Benchmark
-  def basicLogging(): Unit = {
-    var x = 0
-    for(i <- 1 to limit) {
-      logDebug(s"started iteration $i")
-      x += i
-      logDebug(s"finished iteration $i")
-    }
-    if(debugEnabled)
-      tmp = x
   }
 #+END_SRC
 
@@ -202,6 +181,23 @@ object LazyConfig {
   }
 #+END_SRC
 
+
+** JMH Benchmark
+
+#+BEGIN_SRC scala
+  @Benchmark
+  def basicLogging(): Unit = {
+    var x = 0
+    for(i <- 1 to limit) {
+      logDebug(s"started iteration $i")
+      x += i
+      logDebug(s"finished iteration $i")
+    }
+    if(debugEnabled)
+      tmp = x
+  }
+#+END_SRC
+
 ** Results
 
 #+BEGIN_SRC
@@ -211,8 +207,8 @@ object LazyConfig {
 [info]   CI (99.9%): [4.756, 4.869] (assumes normal distribution)
 #+END_SRC
 
-- So ~200ms/run
-- 8,000,004 Objects created
+- So ~200ms / iteration
+- 8,000,004 Objects created per iteraction
   - 4M WrappedArray$ofRef
   - 2M StringBuilders
   - 2M StringContext$$anonfun$s$1
@@ -375,25 +371,42 @@ The exact same results as our hand optimised version with none of the ugly.
 
 * Lets look at some GC graphs
 
+** For the record
+
+[[images/li_hoayi_gc.png]]
+I totally agree, it makes these graphs easy to misinterpret
+
+** Flags
+
+- I'm not going to talk about modifying GC flags or collectors
+- Advice
+  - Be careful
+  - Check real application behavior
+  - JVisualVM VisualGC is useful
+  - Stalling vs continous collecting depending on application.
+
 ** JVisualVM
 
-[[./images/JVisualVMOverview.png]]
+[[images/JVisualVMOverview.png]]
 
-** JVisualVM CPU Usage
+** CPU Usage
 
+[[images/GCViewSingleCore.png]]
 
-PIC CPU Usage - cores div total
+** Tenuring
 
-- Be aware of cpu count
+[[images/GCViewPrematureTenuring.png]]
+ - also install the VisualGC plugin
 
-** JVisualVM Memory Churn
+** JVisualVM Idealised view
 
-** JVisualVM Premature tenuring
+[[images/GCIdeal.png]]
 
-- Full GC stalls
-  - can be even more damaging than you think.
+** A note about full GCs
 
-
+- Stop the world GCs can be very log
+- Minimise object creation and object lifecycles to avoid.
+- Long GC pauses can cause other issues (timeouts etc)
 
 * Profiling your application
 
@@ -404,19 +417,39 @@ PIC CPU Usage - cores div total
 
 ** Look where your app is spending time
 
-JVisualVM/Yourkit - hotspots
+[[images/JVisualVMProfiler.png]]
 
-** Look what your application is creating
+** Look where your app is spending time
 
-JVisualVM/Yourkit filtered by <init> - sorted by count
+[[images/YourKitLiveProfile.png]]
 
-- You can see backtraces of where these are coming from.
+** Look for Look what your application is creating
 
-** Things to look out for
+** YourKit snapshot 1
 
- - List items
- - Map
- - Boxing (primative and rich)
+Filter by <init> for object creation
+
+[[images/YourKitSnapshot1.png]]
+
+** Allocation sources
+
+[[images/YourKitSnapshot2.png]]
+
+** Things I normally look out for
+
+ - :: (Scala list element)
+ - Map elements
+ - Boxing (primitive and rich objects)
+ - large counts and things that are
+
+** Thoughts on profiling
+
+- Painful
+- Memory hungry
+- Slow
+- hard to put into your automated process.
+
+* Examples
 
 ** The rest of the talk
 
@@ -427,18 +460,14 @@ Explores worked examples of things I've actually seen
 
 * Breakout
 
-** Code - Input
+** Code - Normal
 
 #+BEGIN_SRC scala
   case class Entry(id: String, value: String)
   // using String keys to avoid boxing later
   val inputs = (1 to 10000).map( i => Entry(s"$i", s"_${i}_")).toList
-#+END_SRC
-
-** Code - Normal
-
-#+BEGIN_SRC scala
-    val result = inputs.map { e => (e.id, e)}.toMap
+  // ...
+  val result = inputs.map { e => (e.id, e)}.toMap
 #+END_SRC
 
 - Creates an intermediate list of tuples, then converts them to a Map.
@@ -447,11 +476,16 @@ Explores worked examples of things I've actually seen
 ** Code - Breakout
 
 #+BEGIN_SRC scala
-    import scala.collection.breakOut
-    val result : Map[String, Entry] = inputs.map { e => (e.id, e)}(breakOut)
+  case class Entry(id: String, value: String)
+  // using String keys to avoid boxing later
+  val inputs = (1 to 10000).map( i => Entry(s"$i", s"_${i}_")).toList
+
+  // ...
+  import scala.collection.breakOut
+  val result : Map[String, Entry] = inputs.map { e => (e.id, e)}(breakOut)
 #+END_SRC
 
-- Note the typinf of result
+- Note the typing of result
   - Allows breakout to infer the right builder
   - inputs.map(_) uses the map builder to contruct result.
 
@@ -557,21 +591,57 @@ Explores worked examples of things I've actually seen
 
 * boxing
 
+** Primitive Boxing
+#+BEGIN_SRC scala
+  case class Entry(id: String, value: String)
+  // using String keys to avoid boxing later
+  val inputs = (1 to 10000).map( i => Entry(s"$i", s"_${i}_")).toList
+  // ...
+  import scala.collection.breakOut
+  val result : Map[String, Entry] = inputs.map { e => (e.id, e)}(breakOut)
 
+#+END_SRC
 
-* Nested toString
+** RichString
 
+#+BEGIN_SRC scala
+  class RichString(val s: String) {
+    def increment = s.map(c => (c + 1).toChar)
+  }
+  implicit def toRichString(s: String) = new RichString(s)
+
+  "foo".increment
+#+END_SRC
 
 * Conclusions
 
+** A new contender
+
+https://github.com/johnynek/inliner
+
+- A new contender
+- Inlining various things in place
+  - Try (avoids the function closure
+
+** A warning
+
+- Scalaxy and Inliner both change the code
+- Can make debugging and following harder.
+
+
+** Conclusions
 - Know your application
 - You do not need to give up the functional lifestyle
+  - but be pragmatic, contained mutation is ok.
 - Use the scientific method
 - Simple optimisation can make a huge difference
 - Check out Scalaxy https://github.com/nativelibs4java/scalaxy-streams
 
 * Question Time!
 
+** Question Time!
 Thanks for listening!
 
-Rory Graves (@a_dev_musing)
+Rory Graves
+@a_dev_musing
+

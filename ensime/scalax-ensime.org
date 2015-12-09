@@ -25,6 +25,8 @@
 - The new kids in town
 - where next!
 
+* What is Ensime
+
 ** What is Ensime? (1)
 
 - ENhanced Scala Interaction Mode for text Editors
@@ -37,9 +39,10 @@
 
 - A Server
   - Wraps the Presentation Compiler
-  - Indexes Jars
-  -
-- A protocol for querying the Server
+  - A search service
+  - debugging support
+  - ...
+- A protocol layer
 - A number of clients
   - Emacs.
   - Sublime
@@ -64,11 +67,15 @@
 
 ** Shiny Pictures
 
-<picture of emacs editing from previous talk>
+[[images/Ensime-basic.png]]
 
 * Atom
 
-* Atomic Stats!
+** Atom in Action
+
+    [[images/atom_ensime.gif]]
+
+** Atomic Stats!
 
 - June - Now
 - 4 contributor
@@ -79,33 +86,46 @@
 
 * Sublime
 
-* Sublime Stats
+** Sublime in Action
+
+[[images/sublime.png]]
+
+** Sublime Stats
 
 - 22 Contributors
 - Became an Ensime project in June
 - 319 commits
 - Old repo brought back to life
-- Xeno-By, Dick Wall, Rory Graves
+- Eugene Burmako, Dick Wall, Rory Graves, Ivar Abrahamsen, Jan Christopher
+- On PackageControl
 
 * Vim
 
+** Vim in Action
 
-* Vimtastic Stats
+[[images/vim-demo.gif]]
 
+** Vimtastic Stats
+
+- August - Now
 - 318 commits
 - Olivier Abdesselam (yazgoo), todesking, Sam Halliday (fommil)
 - 90% coverage!!!
 
-* The Server
+* Emacs
 
-- Tweaks
+** Emacs in action
+
+[[images/Ensime-basic.png]]
+
+- improvements
+- tweaks
+
+** The Server
+
 - Improvements
+- Tweaks
 - Bug fixes
-
-< server stat!!>
-
-
-
 
 
 * The coming storm!
@@ -117,7 +137,7 @@
 
 ** Graphpocolypse! - Sam
 
-- Cross reference data in a graph DB.
+- Cross reference data in a graph DB (OrientDB)
 - A feature enable
   - Find usage
   - code analysis
@@ -140,9 +160,7 @@
 - Editors are not at feature parity
 - They are evolving as we speak.
 
-
 * Conclusions
-
 
 ** Conclusion
 

@@ -11,13 +11,16 @@ object LazyConfig {
 
 object LazyLogging {
   def main(args: Array[String]): Unit = {
-    Thread.sleep(15000)
     val ll = new LazyLogging()
-    ll.noForLoopGuarded()
+    ll.basicLogging()
     System.gc()
     System.out.println("HERE")
     Thread.sleep(15000)
-    ll.noForLoopGuarded()
+    var i = 0
+    while(i < LazyConfig.limit) {
+      ll.basicLogging()
+      i += 1
+    }
     Thread.sleep(15000)
   }
 }
@@ -124,5 +127,7 @@ class LazyLogging {
     if(debugEnabled)
       tmp = x
 
+    val l = List(1,2,3)
+    l.toString()
   }
 }
